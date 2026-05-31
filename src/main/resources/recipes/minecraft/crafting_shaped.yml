@@ -1,0 +1,10 @@
+rebarwrench:wrench:
+  pattern:
+    - " I "
+    - " T "
+    - " T "
+  key:
+    I: minecraft:iron_ingot
+    T: pylon:tin_ingot
+  result: rebarwrench:wrench
+  category: misc

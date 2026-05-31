@@ -1,0 +1,14 @@
+addon: "RebarWrench"
+
+item:
+  wrench:
+    name: "Wrench"
+    lore: |- 
+      <arrow> A wrench.
+      <arrow> <insn><key:key.use></insn> to switch value in the current key
+      <arrow> <insn><key:key.sneak> + <key:key.use></insn> to switch key between keys
+
+message:
+  switch_key: "<gray>Switched to key: <yellow>%key%</yellow>"
+  switch_value: "<gray>Set <yellow>%key%</yellow> to <green>%value%</green>"
+  not_usable: "<red>Cannot use wrenches on this machine."

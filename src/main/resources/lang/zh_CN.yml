@@ -1,0 +1,14 @@
+addon: "RebarWrench"
+
+item:
+  wrench:
+    name: "扳手"
+    lore: |-
+      <arrow> 一个扳手。
+      <arrow> <insn><key:key.use></insn> 切换当前选项的值
+      <arrow> <insn><key:key.sneak> + <key:key.use></insn> 切换配置项
+
+message:
+  switch_key: "<gray>已切换至配置项：<yellow>%key%</yellow>"
+  switch_value: "<gray>已将 <yellow>%key%</yellow> 设置为 <green>%value%</green>"
+  not_usable: "<red>该机器不支持使用扳手。"
