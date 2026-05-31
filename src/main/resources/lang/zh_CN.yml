@@ -6,7 +6,7 @@ item:
     lore: |-
       <arrow> 一个扳手。
       <arrow> <insn><key:key.use></insn> 切换当前选项的值
-      <arrow> <insn><key:key.sneak> + <key:key.use></insn> 切换配置项
+      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.use></insn> 切换配置项
 
 message:
   switch_key: "<gray>已切换至配置项：<yellow>%key%</yellow>"
