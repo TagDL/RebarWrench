@@ -5,10 +5,12 @@ item:
     name: "Wrench"
     lore: |- 
       <arrow> A wrench.
+      <arrow> <insn><key:key.attack></insn> to fast break the block
       <arrow> <insn><key:key.use></insn> to switch value in the current key
       <arrow> <insn><key:key.sneak></insn> + <insn><key:key.use></insn> to switch key between keys
 
 message:
   switch_key: "<gray>Switched to key: <yellow>%key%</yellow>"
   switch_value: "<gray>Set <yellow>%key%</yellow> to <green>%value%</green>"
-  not_usable: "<red>Cannot use wrenches on this machine."
+  not_usable: "<red>You cannot use it on this block!"
+  not_fast_breakable: "<red>You cannot use it to fast break the block!"
