@@ -3,8 +3,8 @@ Wrench for rebar addons
 
 ## For Players & Server Owners
 ### Crafting
-![crafting](media/crafting.png)
-1 * iron ingot + 2 * tin ingot
+![crafting](media/crafting.png)  
+2 * iron ingot + 2 * tin ingot
 
 ### Usage
 ![usage](media/usage.png)

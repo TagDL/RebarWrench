@@ -2,6 +2,7 @@ package io.github.lijinhong11.rebarwrench.api.properties;
 
 import com.google.common.base.Preconditions;
 import io.github.pylonmc.rebar.block.RebarBlock;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -14,15 +15,24 @@ import java.util.Map;
 public class PropertiesMap {
     private final Map<String, Property<?>> properties = new LinkedHashMap<>();
     private final Map<String, Integer> currentIndices = new HashMap<>();
+    private final Map<String, Component> keyDisplayNames = new LinkedHashMap<>();
 
     public PropertiesMap() {
     }
 
-    public void addProperty(@NotNull String key, @NotNull Property<?> property) {
+    public void addProperty(@NotNull String key, @NotNull Component displayName, @NotNull Property<?> property) {
         Preconditions.checkNotNull(key, "key cannot be null");
+        Preconditions.checkNotNull(displayName, "displayName cannot be null");
         Preconditions.checkNotNull(property, "property cannot be null");
         this.properties.put(key, property);
         this.currentIndices.put(key, property.defaultIndex());
+        this.keyDisplayNames.put(key, displayName);
+    }
+
+    public @NotNull Component keyDisplayName(@NotNull String key) {
+        Preconditions.checkNotNull(key, "key cannot be null");
+        Preconditions.checkArgument(this.properties.containsKey(key), "No property found for key: " + key);
+        return this.keyDisplayNames.getOrDefault(key, Component.text(key));
     }
 
     public @Nullable Property<?> getProperty(@NotNull String key) {

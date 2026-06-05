@@ -2,7 +2,9 @@ package io.github.lijinhong11.rebarwrench.wrenches;
 
 import io.github.lijinhong11.rebarwrench.RebarWrench;
 import io.github.lijinhong11.rebarwrench.api.Wrenchable;
+import io.github.lijinhong11.rebarwrench.api.properties.PropertiesMap;
 import io.github.lijinhong11.rebarwrench.api.properties.Property;
+import io.github.lijinhong11.rebarwrench.utils.KeyUtil;
 import io.github.pylonmc.rebar.block.BlockStorage;
 import io.github.pylonmc.rebar.block.RebarBlock;
 import io.github.pylonmc.rebar.block.context.BlockBreakContext;
@@ -25,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TheWrenchItem extends RebarItem implements RebarInteractor {
-    private boolean enableFastBreaking = getSettings(RebarWrench.WRENCH_KEY).get("enableFastBreaking", ConfigAdapter.BOOLEAN, true);
+    private final boolean enableFastBreaking = getSettings(RebarWrench.WRENCH_KEY).get("enableFastBreaking", ConfigAdapter.BOOLEAN, true);
 
     public TheWrenchItem(@NonNull ItemStack stack) {
         super(stack);
@@ -41,19 +43,20 @@ public class TheWrenchItem extends RebarItem implements RebarInteractor {
         RebarBlock rb = BlockStorage.get(clickedBlock);
         if (rb == null) return;
 
-        if (enableFastBreaking && event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            event.setCancelled(true);
-            BlockStorage.breakBlock(clickedBlock, new BlockBreakContext.PluginBreak(clickedBlock, true, true));
-            return;
-        }
-
         Wrenchable wrenchable = RebarWrench.getWrenchable(rb.getClass());
         if (wrenchable == null) {
             p.sendMessage(Component.translatable("rebarwrench.message.not_usable"));
             return;
         }
 
-        Map<String, Property<?>> props = wrenchable.properties().getProperties();
+        if ((enableFastBreaking && !wrenchable.rejectFastBreaking()) && event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            event.setCancelled(true);
+            BlockStorage.breakBlock(clickedBlock, new BlockBreakContext.PluginBreak(clickedBlock, true, true));
+            return;
+        }
+
+        PropertiesMap propertiesMap = wrenchable.properties();
+        Map<String, Property<?>> props = propertiesMap.getProperties();
         if (props.isEmpty()) return;
 
         if (!event.getAction().isRightClick()) return;
@@ -65,7 +68,7 @@ public class TheWrenchItem extends RebarItem implements RebarInteractor {
             int idx = keys.indexOf(currentKey);
             String nextKey = keys.get((idx + 1) % keys.size());
             writeActiveKey(clickedBlock, nextKey);
-            p.sendMessage(Component.translatable("rebarwrench.message.switch_key", RebarArgument.of("key", nextKey)));
+            p.sendMessage(Component.translatable("rebarwrench.message.switch_key", RebarArgument.of("key", propertiesMap.keyDisplayName(nextKey))));
         } else {
             Property<?> property = props.get(currentKey);
             int currentIdx = readIndex(clickedBlock, currentKey, property.defaultIndex());
@@ -74,17 +77,14 @@ public class TheWrenchItem extends RebarItem implements RebarInteractor {
             Object newValue = property.possibleValues().get(nextIdx);
             writeIndex(clickedBlock, currentKey, nextIdx);
             property.triggerOnChange(rb, oldValue, newValue);
-            Component c = Component.translatable("rebarwrench.message.switch_value", RebarArgument.of("key", currentKey), RebarArgument.of("value", String.valueOf(newValue)));
-            p.sendMessage(c);
+            p.sendMessage(Component.translatable("rebarwrench.message.switch_value",
+                    RebarArgument.of("key", propertiesMap.keyDisplayName(currentKey)),
+                    RebarArgument.of("value", property.displayName(nextIdx))));
         }
     }
 
-    private static NamespacedKey blockKey(Block block, String sub) {
-        return new NamespacedKey("rebarwrench", block.getX() + "_" + block.getY() + "_" + block.getZ() + "_" + sub);
-    }
-
     private static String readActiveKey(Block block, List<String> keys) {
-        String key = block.getChunk().getPersistentDataContainer().get(blockKey(block, "active"), PersistentDataType.STRING);
+        String key = block.getChunk().getPersistentDataContainer().get(KeyUtil.blockKey(block, "active"), PersistentDataType.STRING);
         if (key == null || !keys.contains(key)) {
             return keys.getFirst();
         }
@@ -92,16 +92,16 @@ public class TheWrenchItem extends RebarItem implements RebarInteractor {
     }
 
     private static void writeActiveKey(Block block, String key) {
-        block.getChunk().getPersistentDataContainer().set(blockKey(block, "active"), PersistentDataType.STRING, key);
+        block.getChunk().getPersistentDataContainer().set(KeyUtil.blockKey(block, "active"), PersistentDataType.STRING, key);
     }
 
     private static int readIndex(Block block, String propertyKey, int defaultIndex) {
-        NamespacedKey k = blockKey(block, "idx_" + propertyKey);
+        NamespacedKey k = KeyUtil.blockKey(block, "idx_" + propertyKey);
         return block.getChunk().getPersistentDataContainer().getOrDefault(k, PersistentDataType.INTEGER, defaultIndex);
     }
 
     private static void writeIndex(Block block, String propertyKey, int index) {
-        NamespacedKey k = blockKey(block, "idx_" + propertyKey);
+        NamespacedKey k = KeyUtil.blockKey(block, "idx_" + propertyKey);
         block.getChunk().getPersistentDataContainer().set(k, PersistentDataType.INTEGER, index);
     }
 }

@@ -1,6 +1,6 @@
 rebarwrench:wrench:
   pattern:
-    - " I "
+    - "I I"
     - " T "
     - " T "
   key:

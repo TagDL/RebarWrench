@@ -44,6 +44,8 @@ public class RebarWrench extends JavaPlugin implements RebarAddon {
         Bukkit.getPluginManager().registerEvents(new BrushListener(), this);
 
         getLogger().info("RebarWrench is enabled!");
+
+
     }
 
     @Override
