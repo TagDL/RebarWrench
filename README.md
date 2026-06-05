@@ -11,6 +11,8 @@ Wrench for rebar addons
 
 ## For Developers
 ### Importing
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.lijinhong11/RebarWrench)
+
 ```kotlin
 dependencies {
     compileOnly("io.github.lijinhong11:RebarWrench:VERSION")
@@ -27,6 +29,7 @@ import io.github.lijinhong11.rebarwrench.api.properties.Property;
 import io.github.pylonmc.rebar.block.RebarBlock;
 import io.github.pylonmc.rebar.block.base.RebarInteractBlock;
 import io.github.pylonmc.rebar.block.context.BlockCreateContext;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -41,18 +44,21 @@ public class TestMachine extends RebarBlock implements RebarInteractBlock {
     private final NamespacedKey INT = new NamespacedKey(PLUGIN_INSTANCE, "ivalue");
 
     public static final Wrenchable WRENCHABLE = Wrenchable.builder()
-            .addProperty("color", Property.builder(NamedTextColor.class)
-                            .defaultIndex(0)
-                            .possibleValues(NamedTextColor.BLUE, NamedTextColor.GREEN)
-                            .onValueChange((m, oldColor, newColor) -> {
-                                Block b = m.getBlock();
-                                b.setType(newColor == NamedTextColor.BLUE ? Material.BLUE_WOOL : Material.GREEN_WOOL);
-                            })
-                            .build()
-            )
-            .addProperty("ivalue", Property.builder(int.class)
+            .addProperty("color", Component.text("Color"), Property.builder(NamedTextColor.class)
+                    .entries(
+                            Property.entry(NamedTextColor.BLUE, Component.text("Blue")),
+                            Property.entry(NamedTextColor.GREEN, Component.text("Green"))
+                    )
                     .defaultIndex(0)
+                    .onValueChange((m, oldColor, newColor) -> {
+                        Block b = m.getBlock();
+                        b.setType(newColor == NamedTextColor.BLUE ? Material.BLUE_WOOL : Material.GREEN_WOOL);
+                    })
+                    .build()
+            )
+            .addProperty("ivalue", Component.text("Number"), Property.builder(int.class)
                     .possibleValues(0, 1, 2, 3, 4, 5)
+                    .defaultIndex(0)
                     .onValueChange((m, oldInt, newInt) -> {
                         ((TestMachine) m).value = newInt;
                     })
