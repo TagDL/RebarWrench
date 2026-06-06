@@ -5,12 +5,10 @@ item:
     name: "Chave Inglesa"
     lore: |-
       <arrow> Uma chave inglesa.
-      <arrow> <insn><key:key.attack></insn> para quebrar o bloco rapidamente
-      <arrow> <insn><key:key.use></insn> para alternar o valor da chave atual
-      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.use></insn> para alternar entre chaves
+      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.attack></insn> para quebrar o bloco rapidamente
+      <arrow> <insn><key:key.use></insn> para configurar
+      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.use></insn> para girar
 
 message:
-  switch_key: "<gray>Chave alterada para: <yellow>%key%</yellow>"
-  switch_value: "<gray>Definido <yellow>%key%</yellow> para <green>%value%</green>"
   not_usable: "<red>Você não pode usar isto neste bloco."
-  not_fast_breakable: "<red>Você não pode quebrar este bloco rapidamente."
+  operation_unsupported: "<red>Esta operação não é suportada."

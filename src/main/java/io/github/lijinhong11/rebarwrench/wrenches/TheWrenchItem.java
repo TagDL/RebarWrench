@@ -1,30 +1,24 @@
 package io.github.lijinhong11.rebarwrench.wrenches;
 
 import io.github.lijinhong11.rebarwrench.RebarWrench;
+import io.github.lijinhong11.rebarwrench.api.WrenchAction;
+import io.github.lijinhong11.rebarwrench.api.WrenchResult;
 import io.github.lijinhong11.rebarwrench.api.Wrenchable;
-import io.github.lijinhong11.rebarwrench.api.properties.PropertiesMap;
-import io.github.lijinhong11.rebarwrench.api.properties.Property;
-import io.github.lijinhong11.rebarwrench.utils.KeyUtil;
 import io.github.pylonmc.rebar.block.BlockStorage;
 import io.github.pylonmc.rebar.block.RebarBlock;
 import io.github.pylonmc.rebar.block.context.BlockBreakContext;
 import io.github.pylonmc.rebar.config.adapter.ConfigAdapter;
-import io.github.pylonmc.rebar.i18n.RebarArgument;
 import io.github.pylonmc.rebar.item.RebarItem;
 import io.github.pylonmc.rebar.item.base.RebarInteractor;
 import net.kyori.adventure.text.Component;
-import org.bukkit.NamespacedKey;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import org.jspecify.annotations.NonNull;
-
-import java.util.List;
-import java.util.Map;
 
 public class TheWrenchItem extends RebarItem implements RebarInteractor {
     private final boolean enableFastBreaking = getSettings(RebarWrench.WRENCH_KEY).get("enableFastBreaking", ConfigAdapter.BOOLEAN, true);
@@ -36,9 +30,13 @@ public class TheWrenchItem extends RebarItem implements RebarInteractor {
     @Override
     public void onUsedToClick(@NonNull PlayerInteractEvent event, @NonNull EventPriority priority) {
         Player p = event.getPlayer();
-
         Block clickedBlock = event.getClickedBlock();
         if (clickedBlock == null) return;
+
+        Material type = clickedBlock.getType();
+        if (type == Material.SUSPICIOUS_SAND || type == Material.SUSPICIOUS_GRAVEL) {
+            event.setCancelled(true);
+        }
 
         RebarBlock rb = BlockStorage.get(clickedBlock);
         if (rb == null) return;
@@ -49,59 +47,28 @@ public class TheWrenchItem extends RebarItem implements RebarInteractor {
             return;
         }
 
-        if ((enableFastBreaking && !wrenchable.rejectFastBreaking()) && event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            event.setCancelled(true);
-            BlockStorage.breakBlock(clickedBlock, new BlockBreakContext.PluginBreak(clickedBlock, true, true));
+        WrenchAction action;
+        if (event.getAction() == Action.LEFT_CLICK_BLOCK && p.isSneaking()) {
+            if (!enableFastBreaking) return;
+            action = WrenchAction.FAST_BREAK;
+        } else if (event.getAction().isRightClick()) {
+            action = p.isSneaking() ? WrenchAction.ROTATE : WrenchAction.CONFIGURE;
+        } else {
             return;
         }
 
-        PropertiesMap propertiesMap = wrenchable.properties();
-        Map<String, Property<?>> props = propertiesMap.getProperties();
-        if (props.isEmpty()) return;
+        WrenchResult result = wrenchable.onWrenchInteract(p, rb, action);
 
-        if (!event.getAction().isRightClick()) return;
-
-        List<String> keys = List.copyOf(props.keySet());
-        String currentKey = readActiveKey(clickedBlock, keys);
-
-        if (event.getPlayer().isSneaking()) {
-            int idx = keys.indexOf(currentKey);
-            String nextKey = keys.get((idx + 1) % keys.size());
-            writeActiveKey(clickedBlock, nextKey);
-            p.sendMessage(Component.translatable("rebarwrench.message.switch_key", RebarArgument.of("key", propertiesMap.keyDisplayName(nextKey))));
-        } else {
-            Property<?> property = props.get(currentKey);
-            int currentIdx = readIndex(clickedBlock, currentKey, property.defaultIndex());
-            int nextIdx = (currentIdx + 1) % property.possibleValues().size();
-            Object oldValue = property.possibleValues().get(currentIdx);
-            Object newValue = property.possibleValues().get(nextIdx);
-            writeIndex(clickedBlock, currentKey, nextIdx);
-            property.triggerOnChange(rb, oldValue, newValue);
-            p.sendMessage(Component.translatable("rebarwrench.message.switch_value",
-                    RebarArgument.of("key", propertiesMap.keyDisplayName(currentKey)),
-                    RebarArgument.of("value", property.displayName(nextIdx))));
+        if (result == WrenchResult.FAILED) {
+            p.sendMessage(Component.translatable("rebarwrench.message.operation_unsupported"));
         }
-    }
 
-    private static String readActiveKey(Block block, List<String> keys) {
-        String key = block.getChunk().getPersistentDataContainer().get(KeyUtil.blockKey(block, "active"), PersistentDataType.STRING);
-        if (key == null || !keys.contains(key)) {
-            return keys.getFirst();
+        if (action == WrenchAction.FAST_BREAK && result == WrenchResult.SUCCESS) {
+            event.setCancelled(true);
+            BlockStorage.breakBlock(clickedBlock, new BlockBreakContext.PluginBreak(clickedBlock, true, true));
         }
-        return key;
-    }
 
-    private static void writeActiveKey(Block block, String key) {
-        block.getChunk().getPersistentDataContainer().set(KeyUtil.blockKey(block, "active"), PersistentDataType.STRING, key);
-    }
-
-    private static int readIndex(Block block, String propertyKey, int defaultIndex) {
-        NamespacedKey k = KeyUtil.blockKey(block, "idx_" + propertyKey);
-        return block.getChunk().getPersistentDataContainer().getOrDefault(k, PersistentDataType.INTEGER, defaultIndex);
-    }
-
-    private static void writeIndex(Block block, String propertyKey, int index) {
-        NamespacedKey k = KeyUtil.blockKey(block, "idx_" + propertyKey);
-        block.getChunk().getPersistentDataContainer().set(k, PersistentDataType.INTEGER, index);
+        //avoid other machine events happen
+        event.setCancelled(true);
     }
 }

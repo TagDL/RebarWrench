@@ -5,12 +5,10 @@ item:
     name: "扳手"
     lore: |-
       <arrow> 一個扳手。
-      <arrow> <insn><key:key.attack></insn> 快速拆解方塊
-      <arrow> <insn><key:key.use></insn> 切換目前選項的值
-      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.use></insn> 切換設定項目
+      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.attack></insn> 快速拆解方塊
+      <arrow> <insn><key:key.use></insn> 配置
+      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.use></insn> 旋轉
 
 message:
-  switch_key: "<gray>已切換至設定項目：<yellow>%key%</yellow>"
-  switch_value: "<gray>已將 <yellow>%key%</yellow> 設定為 <green>%value%</green>"
   not_usable: "<red>你不能在此方塊上使用扳手。"
-  not_fast_breakable: "<red>此方塊不支援快速拆解。"
+  operation_unsupported: "<red>此操作不支援。"

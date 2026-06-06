@@ -24,8 +24,9 @@ Replace the `VERSION` to the latest addon version
 ```java
 package io.github.lijinhong11.rebarwrench;
 
+import io.github.lijinhong11.rebarwrench.api.WrenchAction;
+import io.github.lijinhong11.rebarwrench.api.WrenchResult;
 import io.github.lijinhong11.rebarwrench.api.Wrenchable;
-import io.github.lijinhong11.rebarwrench.api.properties.Property;
 import io.github.pylonmc.rebar.block.RebarBlock;
 import io.github.pylonmc.rebar.block.base.RebarInteractBlock;
 import io.github.pylonmc.rebar.block.context.BlockCreateContext;
@@ -42,30 +43,28 @@ import org.jspecify.annotations.NonNull;
 
 public class TestMachine extends RebarBlock implements RebarInteractBlock {
     private final NamespacedKey INT = new NamespacedKey(PLUGIN_INSTANCE, "ivalue");
+    private int colorIndex = 0;
+    private int value = 0;
+    private final NamedTextColor[] COLORS = {NamedTextColor.BLUE, NamedTextColor.GREEN};
 
     public static final Wrenchable WRENCHABLE = Wrenchable.builder()
-            .addProperty("color", Component.text("Color"), Property.builder(NamedTextColor.class)
-                    .entries(
-                            Property.entry(NamedTextColor.BLUE, Component.text("Blue")),
-                            Property.entry(NamedTextColor.GREEN, Component.text("Green"))
-                    )
-                    .defaultIndex(0)
-                    .onValueChange((m, oldColor, newColor) -> {
-                        Block b = m.getBlock();
-                        b.setType(newColor == NamedTextColor.BLUE ? Material.BLUE_WOOL : Material.GREEN_WOOL);
-                    })
-                    .build()
-            )
-            .addProperty("ivalue", Component.text("Number"), Property.builder(int.class)
-                    .possibleValues(0, 1, 2, 3, 4, 5)
-                    .defaultIndex(0)
-                    .onValueChange((m, oldInt, newInt) -> {
-                        ((TestMachine) m).value = newInt;
-                    })
-                    .build())
+            .interactFunction((Player player, RebarBlock block, WrenchAction action) -> {
+                TestMachine machine = (TestMachine) block;
+                return switch (action) {
+                    case CONFIGURE -> {
+                        machine.colorIndex = (machine.colorIndex + 1) % machine.COLORS.length;
+                        player.sendActionBar(Component.text("Color: " + machine.COLORS[machine.colorIndex].toString()));
+                        yield WrenchResult.SUCCESS;
+                    }
+                    case ROTATE -> {
+                        machine.value = (machine.value + 1) % 6;
+                        player.sendActionBar(Component.text("Value: " + machine.value));
+                        yield WrenchResult.SUCCESS;
+                    }
+                    case FAST_BREAK -> WrenchResult.SUCCESS;
+                };
+            })
             .build();
-
-    private int value = 0;
 
     public TestMachine(@NonNull Block block, @NonNull BlockCreateContext context) {
         super(block, context);
@@ -77,10 +76,7 @@ public class TestMachine extends RebarBlock implements RebarInteractBlock {
 
     @Override
     public void onInteract(@NonNull PlayerInteractEvent e, @NonNull EventPriority priority) {
-        if (!e.getAction().isRightClick()) {
-            return;
-        }
-
+        if (!e.getAction().isRightClick()) return;
         e.getPlayer().sendMessage("The int value is " + value);
     }
 

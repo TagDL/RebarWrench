@@ -1,7 +1,6 @@
 package io.github.lijinhong11.rebarwrench;
 
 import io.github.lijinhong11.rebarwrench.api.Wrenchable;
-import io.github.lijinhong11.rebarwrench.listeners.BlockListener;
 import io.github.lijinhong11.rebarwrench.listeners.BrushListener;
 import io.github.lijinhong11.rebarwrench.utils.Locales;
 import io.github.lijinhong11.rebarwrench.wrenches.TheWrenchItem;
@@ -45,7 +44,6 @@ public class RebarWrench extends JavaPlugin implements RebarAddon {
         PylonPages.TOOLS.addItem(wrench);
 
         Bukkit.getPluginManager().registerEvents(new BrushListener(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
 
         getLogger().info("RebarWrench is enabled!");
     }
