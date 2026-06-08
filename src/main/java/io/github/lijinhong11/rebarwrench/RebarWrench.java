@@ -2,14 +2,12 @@ package io.github.lijinhong11.rebarwrench;
 
 import io.github.lijinhong11.rebarwrench.api.Wrenchable;
 import io.github.lijinhong11.rebarwrench.listeners.BrushListener;
-import io.github.lijinhong11.rebarwrench.utils.Locales;
 import io.github.lijinhong11.rebarwrench.wrenches.TheWrenchItem;
 import io.github.pylonmc.pylon.PylonPages;
 import io.github.pylonmc.rebar.addon.RebarAddon;
 import io.github.pylonmc.rebar.block.RebarBlock;
 import io.github.pylonmc.rebar.item.RebarItem;
 import io.github.pylonmc.rebar.item.builder.ItemStackBuilder;
-import org.apache.commons.lang3.LocaleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -62,7 +60,9 @@ public class RebarWrench extends JavaPlugin implements RebarAddon {
     public @NonNull Set<Locale> getLanguages() {
 
 
-        return Set.of(Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.TRADITIONAL_CHINESE, Locales.PT_BR);
+        return Set.of(Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.TRADITIONAL_CHINESE,
+                Locale.of("pt", "BR"), Locale.of("pt", "PT"),
+                Locale.of("fr", "FR"), Locale.of("es", "ES"));
     }
 
     @Override

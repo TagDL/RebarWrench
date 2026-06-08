@@ -1,0 +1,14 @@
+addon: "RebarWrench"
+
+item:
+  wrench:
+    name: "Chave Inglesa"
+    lore: |-
+      <arrow> Uma chave inglesa.
+      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.attack></insn> para partir o bloco rapidamente
+      <arrow> <insn><key:key.use></insn> para configurar
+      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.use></insn> para rodar
+
+message:
+  not_usable: "<red>Não podes usar isto neste bloco."
+  operation_unsupported: "<red>Esta operação não é suportada."

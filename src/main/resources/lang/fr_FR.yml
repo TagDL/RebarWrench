@@ -1,0 +1,14 @@
+addon: "RebarWrench"
+
+item:
+  wrench:
+    name: "Clé à molette"
+    lore: |-
+      <arrow> Une clé à molette.
+      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.attack></insn> pour casser le bloc rapidement
+      <arrow> <insn><key:key.use></insn> pour configurer
+      <arrow> <insn><key:key.sneak></insn> + <insn><key:key.use></insn> pour faire pivoter
+
+message:
+  not_usable: "<red>Vous ne pouvez pas utiliser cela sur ce bloc."
+  operation_unsupported: "<red>Cette opération n'est pas prise en charge."
