@@ -9,7 +9,7 @@ import io.github.pylonmc.rebar.block.RebarBlock;
 import io.github.pylonmc.rebar.block.context.BlockBreakContext;
 import io.github.pylonmc.rebar.config.adapter.ConfigAdapter;
 import io.github.pylonmc.rebar.item.RebarItem;
-import io.github.pylonmc.rebar.item.base.RebarInteractor;
+import io.github.pylonmc.rebar.item.interfaces.InteractRebarItemHandler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,15 +20,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jspecify.annotations.NonNull;
 
-public class TheWrenchItem extends RebarItem implements RebarInteractor {
-    private final boolean enableFastBreaking = getSettings(RebarWrench.WRENCH_KEY).get("enableFastBreaking", ConfigAdapter.BOOLEAN, true);
+public class TheWrenchItem extends RebarItem implements InteractRebarItemHandler {
+    private final boolean enableFastBreaking = getSettings().get("enableFastBreaking", ConfigAdapter.BOOLEAN, true);
 
     public TheWrenchItem(@NonNull ItemStack stack) {
         super(stack);
     }
 
     @Override
-    public void onUsedToClick(@NonNull PlayerInteractEvent event, @NonNull EventPriority priority) {
+    public void onInteract(@NonNull PlayerInteractEvent event, @NonNull EventPriority priority) {
         Player p = event.getPlayer();
         Block clickedBlock = event.getClickedBlock();
         if (clickedBlock == null) return;
